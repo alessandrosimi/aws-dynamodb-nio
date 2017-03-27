@@ -1,5 +1,8 @@
 # Aws DynamoDB Non-Blocking IO Client
 
+**Latest release:** Pre Release<br/>
+**License:** [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
 Scala dynamoDB client built on top of Apache [async http client](https://hc.apache.org/httpcomponents-asyncclient-dev/)
 with almost the same API provided by [AWS SKD for Java(tm)](https://aws.amazon.com/it/sdk-for-java/)
 
