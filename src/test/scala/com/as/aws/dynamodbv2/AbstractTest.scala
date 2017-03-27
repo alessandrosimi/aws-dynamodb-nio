@@ -18,7 +18,7 @@ abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with Befo
   val client = new AmazonDynamoDBNioClient(
     endpoint = localDynamoDb.endpoint,
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey"))
-  )
+  )(global)
 
   override def beforeAll(): Unit = {
     localDynamoDb.start()

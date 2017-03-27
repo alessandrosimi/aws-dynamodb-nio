@@ -43,7 +43,7 @@
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--Dependency:-->
+        <!-- Dynamo DB Local-->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>DynamoDBLocal</artifactId>
