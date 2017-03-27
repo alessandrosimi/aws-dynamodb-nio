@@ -28,15 +28,15 @@ abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with Befo
 
   def resultOf[A](futureResult: Future[A]): A = Await.result(futureResult, 1.minute)
 
-  private val localDynamoDb = new LocalDynamoDb
+  val server = new DynamoDbServer
 
   val client = new AmazonDynamoDBNioClient(
-    endpoint = localDynamoDb.endpoint,
+    endpoint = server.endpoint,
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey"))
   )(global)
 
   override def beforeAll(): Unit = {
-    localDynamoDb.start()
+    server.start()
   }
 
   before {
@@ -47,7 +47,7 @@ abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with Befo
 
   override def afterAll(): Unit = {
     client.shutdown()
-    localDynamoDb.stop()
+    server.stop()
   }
 
 }

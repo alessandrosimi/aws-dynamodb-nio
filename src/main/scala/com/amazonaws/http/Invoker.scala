@@ -122,7 +122,7 @@ class Invoker(serviceName: String,
   }
 
   private def isRequestSuccessful(response: ApacheHttpResponse): Boolean = {
-    val status = response.getStatusLine.getStatusCode
+    val status = getStatusCode(response)
     status / 100 == HttpStatus.SC_OK / 100
   }
 
@@ -151,16 +151,18 @@ class Invoker(serviceName: String,
     }
   }
 
+  private def getStatusCode(apacheHttpResponse: ApacheHttpResponse) =
+    Option(apacheHttpResponse.getStatusLine).map(_.getStatusCode).getOrElse(-1)
+
+  private def getReasonPhrase(apacheHttpResponse: ApacheHttpResponse) =
+    Option(apacheHttpResponse.getStatusLine).map(_.getReasonPhrase).orNull
+
   private def handleErrorResponse(request: Request[_],
                                   errorResponseHandler: HttpResponseHandler[AmazonServiceException],
                                   method: HttpRequestBase,
                                   apacheHttpResponse: ApacheHttpResponse): AmazonServiceException = {
-    val (statusCode, reasonPhrase) = Option(apacheHttpResponse.getStatusLine) match {
-      case Some(statusLine) =>
-        (statusLine.getStatusCode, statusLine.getReasonPhrase)
-      case None =>
-        (-1, null)
-    }
+    val statusCode = getStatusCode(apacheHttpResponse)
+    val reasonPhrase = getReasonPhrase(apacheHttpResponse)
     try {
       val response = createResponse(method, request, apacheHttpResponse)
       val exception = errorResponseHandler.handle(response)

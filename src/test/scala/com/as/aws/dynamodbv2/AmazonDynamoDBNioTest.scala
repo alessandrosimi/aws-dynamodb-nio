@@ -15,6 +15,8 @@
   */
 package com.as.aws.dynamodbv2
 
+import com.amazonaws.AmazonServiceException
+import com.amazonaws.services.dynamodbv2.exceptions.AmazonServiceExceptionType
 import com.amazonaws.services.dynamodbv2.model._
 
 import scala.collection.JavaConverters._
@@ -233,6 +235,17 @@ class AmazonDynamoDBNioTest extends AbstractTest with DynamoDBOperations {
       items should have size 1
       items.head.asScala("key").getS should be ("key1")
       batchGetResult = resultOf(client.batchGetItem(gets, "consumedCapacity"))
+    }
+
+  }
+
+  feature("Handling failures") {
+
+    scenario("fails to list tables") {
+      val error = intercept[AmazonServiceException] {
+        resultOf(client.listTables("a"))
+      }
+      error.getErrorMessage.toLowerCase should include ("invalid table")
     }
 
   }
