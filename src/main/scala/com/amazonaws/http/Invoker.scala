@@ -87,7 +87,7 @@ class Invoker(serviceName: String,
         )
         new Response[Resp](response, httpResponse)
       case apacheHttpResponse if isTemporaryRedirect(apacheHttpResponse) =>
-        ???
+        ??? // TODO implement redirect
       case apacheHttpResponse =>
         val error = handleErrorResponse(
           request = request,

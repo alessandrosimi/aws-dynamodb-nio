@@ -1,0 +1,93 @@
+package com.amazonaws.http
+
+import java.io.IOException
+
+import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfiguration}
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.internal.StaticCredentialsProvider
+import com.amazonaws.services.dynamodbv2.exceptions.AmazonServiceExceptionType
+import com.amazonaws.services.dynamodbv2.model.ListTablesRequest
+import com.amazonaws.services.dynamodbv2.model.transform.{ListTablesRequestMarshaller, ListTablesResultJsonUnmarshaller}
+import com.as.aws.dynamodbv2.AbstractTest
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class InvokerTest extends AbstractTest {
+
+  feature("Handle failure") {
+
+    scenario("IO Exception") {
+      val ioException = new IOException("Failing for IO Exception")
+      val invoker = createInvoker(new FailingHandler(ioException))
+      invoker.start()
+      server.setExceptionType(AmazonServiceExceptionType.INTERNAL_FAILURE)
+      val error = intercept[IOException] {
+        invoke(invoker)
+      }
+      error should be (ioException)
+      invoker.stop()
+    }
+
+    scenario("Request entity too large") {
+      val invoker = createInvoker(new FailingHandler())
+      invoker.start()
+      server.setException(responseCode = 413)
+      val error = intercept[AmazonServiceException] {
+        invoke(invoker)
+      }
+      error.getStatusCode should be (413)
+      error.getErrorMessage should be ("Request entity too large")
+      invoker.stop()
+    }
+
+    scenario("Service unavailable") {
+      val invoker = createInvoker(new FailingHandler())
+      invoker.start()
+      server.setException(responseCode = 503)
+      val error = intercept[AmazonServiceException] {
+        invoke(invoker)
+      }
+      error.getStatusCode should be (503)
+      error.getErrorMessage should be ("Service unavailable")
+      invoker.stop()
+    }
+
+    scenario("Handler exception") {
+      val handlerException = new Exception("Handler exception")
+      val invoker = createInvoker(new FailingHandler(handlerException))
+      invoker.start()
+      server.setException(responseCode = 999)
+      val error = intercept[AmazonClientException] {
+        invoke(invoker)
+      }
+      error.getCause should be (handlerException)
+      invoker.stop()
+    }
+
+  }
+
+
+  def invoke(invoker: Invoker) = resultOf {
+    invoker.invoke(
+      req = new ListTablesRequest(),
+      marshaller = new ListTablesRequestMarshaller,
+      unmarshaller = new ListTablesResultJsonUnmarshaller
+    )
+  }
+
+  def createInvoker(errorResponseHandler: HttpResponseHandler[AmazonServiceException]) = new Invoker(
+    serviceName = "dynamodb",
+    endpoint = server.endpoint,
+    awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey")),
+    config = new ClientConfiguration(),
+    errorResponseHandler = errorResponseHandler,
+    executionContext = global
+  )
+
+  class FailingHandler(throwable: Throwable = new Exception("Generic failure"))
+    extends HttpResponseHandler[AmazonServiceException] {
+    def needsConnectionLeftOpen(): Boolean = false
+    def handle(response: HttpResponse): AmazonServiceException = throw throwable
+  }
+
+}

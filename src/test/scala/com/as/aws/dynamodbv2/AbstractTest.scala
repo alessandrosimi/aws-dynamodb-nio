@@ -40,6 +40,7 @@ abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with Befo
   }
 
   before {
+    server.clearExceptionType()
     resultOf(client.listTables)
       .getTableNames.asScala
       .foreach( tableName => resultOf(client.deleteTable(tableName)) )

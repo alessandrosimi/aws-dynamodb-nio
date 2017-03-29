@@ -58,11 +58,23 @@ class DynamoDbServer(port: Int = 8989) {
     override def run():Unit = DynamoDbServer.this.stop()
   })
 
-  private var exceptionType: Option[AmazonServiceExceptionType] = None
+  private var exceptionType: Option[InjectedFailure] = None
 
-  def setExceptionType(exceptionType: AmazonServiceExceptionType) = this.exceptionType = Some(exceptionType)
+  def setExceptionType(exception: AmazonServiceExceptionType) = this.exceptionType = Some(InjectedFailure(
+    responseCode = exception.getResponseStatus,
+    errorCode = exception.getErrorCode,
+    errorMessage = exception.getMessage
+  ))
+
+  def setException(responseCode: Int, errorCode: String = "", errorMessage: String = "") = this.exceptionType = Some(InjectedFailure(
+    responseCode = responseCode,
+    errorCode = errorCode,
+    errorMessage = errorMessage
+  ))
 
   def clearExceptionType() = this.exceptionType = None
+
+  private case class InjectedFailure(responseCode: Int, errorCode: String, errorMessage: String)
 
   private class LocalDynamoDBServerHandlerWithException(handler: DynamoDBRequestHandler)
     extends LocalDynamoDBServerHandler(handler, EmptyCorsParams) {
@@ -73,11 +85,11 @@ class DynamoDbServer(port: Int = 8989) {
                         response: HttpServletResponse): Unit = exceptionType match {
       case None =>
         super.handle(target, baseRequest, request, response)
-      case Some(exception) =>
+      case Some(InjectedFailure(responseCode, errorCode, errorMessage)) =>
         baseRequest.setHandled(true)
         val res: ResponseData = new ResponseData(response)
-        res.getHttpServletResponse.setStatus(exception.getResponseStatus)
-        res.setResponseBody(this.jsonMapper.writeValueAsBytes(new ExceptionBean(exception.getErrorCode, exception.getMessage)))
+        res.getHttpServletResponse.setStatus(responseCode)
+        res.setResponseBody(this.jsonMapper.writeValueAsBytes(new ExceptionBean(errorCode, errorMessage)))
         response.setHeader("x-amzn-RequestId", UUID.randomUUID.toString)
         response.getOutputStream.write(res.getResponseBody)
     }
