@@ -21,13 +21,25 @@ import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfi
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.internal.StaticCredentialsProvider
 import com.amazonaws.services.dynamodbv2.exceptions.AmazonServiceExceptionType
-import com.amazonaws.services.dynamodbv2.model.ListTablesRequest
+import com.amazonaws.services.dynamodbv2.model.{ListTablesRequest, ListTablesResult}
 import com.amazonaws.services.dynamodbv2.model.transform.{ListTablesRequestMarshaller, ListTablesResultJsonUnmarshaller}
+import com.amazonaws.transform.JsonUnmarshallerContext
 import com.as.aws.dynamodbv2.AbstractTest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvokerTest extends AbstractTest {
+
+  scenario("fail to unmarshall successful response") {
+    val invoker = createInvoker()
+    invoker.start()
+    val error = intercept[AmazonClientException] {
+      invoke(invoker, failToUnmarshall = true)
+    }
+    error.getMessage should include ("unmarshall")
+    error.getMessage should include ("200")
+    invoker.stop()
+  }
 
   feature("Handle failure") {
 
@@ -35,7 +47,7 @@ class InvokerTest extends AbstractTest {
       val ioException = new IOException("Failing for IO Exception")
       val invoker = createInvoker(new FailingHandler(ioException))
       invoker.start()
-      server.forcedToFailsWith(AmazonServiceExceptionType.INTERNAL_FAILURE)
+      server.forceFailureWith(AmazonServiceExceptionType.INTERNAL_FAILURE)
       val error = intercept[IOException] {
         invoke(invoker)
       }
@@ -46,7 +58,7 @@ class InvokerTest extends AbstractTest {
     scenario("Request entity too large") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forcedToFailsWith(responseCode = 413)
+      server.forceFailureWith(responseCode = 413)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -58,7 +70,7 @@ class InvokerTest extends AbstractTest {
     scenario("Service unavailable") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forcedToFailsWith(responseCode = 503)
+      server.forceFailureWith(responseCode = 503)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -71,7 +83,7 @@ class InvokerTest extends AbstractTest {
       val handlerException = new Exception("Handler exception")
       val invoker = createInvoker(new FailingHandler(handlerException))
       invoker.start()
-      server.forcedToFailsWith(responseCode = 999)
+      server.forceFailureWith(responseCode = 999)
       val error = intercept[AmazonClientException] {
         invoke(invoker)
       }
@@ -82,15 +94,20 @@ class InvokerTest extends AbstractTest {
   }
 
 
-  def invoke(invoker: Invoker) = resultOf {
+  def invoke(invoker: Invoker, failToUnmarshall: Boolean = false) = resultOf {
     invoker.invoke(
       req = new ListTablesRequest(),
       marshaller = new ListTablesRequestMarshaller,
-      unmarshaller = new ListTablesResultJsonUnmarshaller
+      unmarshaller = new ListTablesResultJsonUnmarshaller {
+        override def unmarshall(context: JsonUnmarshallerContext): ListTablesResult = {
+          if (failToUnmarshall) throw new Exception("Injected failure")
+          super.unmarshall(context)
+        }
+      }
     )
   }
 
-  def createInvoker(errorResponseHandler: HttpResponseHandler[AmazonServiceException]) = new Invoker(
+  def createInvoker(errorResponseHandler: HttpResponseHandler[AmazonServiceException] = new FailingHandler) = new Invoker(
     serviceName = "dynamodb",
     endpoint = server.endpoint,
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey")),

@@ -68,23 +68,26 @@ class DynamoDbServer(port: Int = 8989) {
     override def run():Unit = DynamoDbServer.this.stop()
   })
 
-  private var exceptionType: Option[InjectedFailure] = None
+  private var exceptionType: HandlerBehaviour = Successful
 
-  def forcedToFailsWith(exception: AmazonServiceExceptionType) = this.exceptionType = Some(InjectedFailure(
+  def forceFailureWith(exception: AmazonServiceExceptionType) = this.exceptionType = InjectedFailure(
     responseCode = exception.getResponseStatus,
     errorCode = exception.getErrorCode,
     errorMessage = exception.getMessage
-  ))
+  )
 
-  def forcedToFailsWith(responseCode: Int, errorCode: String = "", errorMessage: String = "") = this.exceptionType = Some(InjectedFailure(
+  def forceFailureWith(responseCode: Int, errorCode: String = "", errorMessage: String = "") = this.exceptionType = InjectedFailure(
     responseCode = responseCode,
     errorCode = errorCode,
     errorMessage = errorMessage
-  ))
+  )
 
-  def clearForcedFailure() = this.exceptionType = None
+  def clearForcedFailure() = this.exceptionType = Successful
 
-  private case class InjectedFailure(responseCode: Int, errorCode: String, errorMessage: String)
+  private sealed trait HandlerBehaviour
+  private object Successful extends HandlerBehaviour
+  private object CancelRequest extends HandlerBehaviour
+  private case class InjectedFailure(responseCode: Int, errorCode: String, errorMessage: String) extends HandlerBehaviour
 
   private class LocalDynamoDBServerHandlerWithException(handler: DynamoDBRequestHandler)
     extends LocalDynamoDBServerHandler(handler, EmptyCorsParams) {
@@ -93,9 +96,9 @@ class DynamoDbServer(port: Int = 8989) {
                         baseRequest: Request,
                         request: HttpServletRequest,
                         response: HttpServletResponse): Unit = exceptionType match {
-      case None =>
+      case Successful =>
         super.handle(target, baseRequest, request, response)
-      case Some(InjectedFailure(responseCode, errorCode, errorMessage)) =>
+      case InjectedFailure(responseCode, errorCode, errorMessage) =>
         baseRequest.setHandled(true)
         val res: ResponseData = new ResponseData(response)
         res.getHttpServletResponse.setStatus(responseCode)
