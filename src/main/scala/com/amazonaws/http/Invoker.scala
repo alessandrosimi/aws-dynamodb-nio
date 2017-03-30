@@ -48,7 +48,7 @@ class Invoker(serviceName: String,
 
   private implicit val ec = executionContext
 
-  private val client = new ClientBuilder(config).build
+  private val client = new InvokerClientBuilder(config).build
 
   private val httpRequestFactory = new HttpRequestFactory
 

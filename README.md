@@ -22,7 +22,7 @@ futureTableList
   .foreach(println)
 ```
 
-The `NIO` client differs for only two aspects. First it needs an implicit excecution context to run it and second, the `setRegion(...)` and `setEndpoint(...)`
+The `NIO` client differs for only two aspects. First it needs an implicit execution context to run it and second, the `setRegion(...)` and `setEndpoint(...)`
 methods return a new client with the value changed.
 
 ## How to get it
