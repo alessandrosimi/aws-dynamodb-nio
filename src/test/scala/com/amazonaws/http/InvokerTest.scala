@@ -1,3 +1,18 @@
+/**
+  * Copyright 2017 Alessandro Simi
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *    http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
 package com.amazonaws.http
 
 import java.io.IOException
@@ -20,7 +35,7 @@ class InvokerTest extends AbstractTest {
       val ioException = new IOException("Failing for IO Exception")
       val invoker = createInvoker(new FailingHandler(ioException))
       invoker.start()
-      server.setExceptionType(AmazonServiceExceptionType.INTERNAL_FAILURE)
+      server.forcedToFailsWith(AmazonServiceExceptionType.INTERNAL_FAILURE)
       val error = intercept[IOException] {
         invoke(invoker)
       }
@@ -31,7 +46,7 @@ class InvokerTest extends AbstractTest {
     scenario("Request entity too large") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.setException(responseCode = 413)
+      server.forcedToFailsWith(responseCode = 413)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -43,7 +58,7 @@ class InvokerTest extends AbstractTest {
     scenario("Service unavailable") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.setException(responseCode = 503)
+      server.forcedToFailsWith(responseCode = 503)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -56,7 +71,7 @@ class InvokerTest extends AbstractTest {
       val handlerException = new Exception("Handler exception")
       val invoker = createInvoker(new FailingHandler(handlerException))
       invoker.start()
-      server.setException(responseCode = 999)
+      server.forcedToFailsWith(responseCode = 999)
       val error = intercept[AmazonClientException] {
         invoke(invoker)
       }

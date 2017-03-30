@@ -27,6 +27,8 @@ import com.amazonaws.services.dynamodbv2.local.exceptions.ExceptionBean
 import com.amazonaws.services.dynamodbv2.local.server.{DynamoDBProxyServer, DynamoDBRequestHandler, LocalDynamoDBRequestHandler, LocalDynamoDBServerHandler}
 import org.eclipse.jetty.server.Request
 
+import scala.util.Try
+
 class DynamoDbServer(port: Int = 8989) {
 
   private val RunInMemory = true
@@ -39,15 +41,23 @@ class DynamoDbServer(port: Int = 8989) {
   private lazy val server = new DynamoDBProxyServer(port, serverHandler)
 
   def start() = {
-    addStorageLibraryToClassPath()
+    loadSqlLiteLibraries()
     server.start()
   }
 
-  private def addStorageLibraryToClassPath() = {
-    val library = "libsqlite4java-linux-amd64.so"
-    val libraryUri = getClass.getClassLoader.getResource(library).toURI
-    val libraryPath = new File(libraryUri).getParent
-    SQLite.setLibraryPath(libraryPath)
+  private def loadSqlLiteLibraries() {
+    val sqlLiteJar = new File(classOf[SQLite].getProtectionDomain.getCodeSource.getLocation.toURI)
+    val version = sqlLiteJar.getParentFile
+    val artifact = version.getParentFile
+    val group = artifact.getParentFile
+    group.listFiles().toList
+      .filter(file => file.getName != artifact.getName)
+      .flatMap(_.listFiles().toList.filter(file => file.getName == version.getName))
+      .map(_.getPath)
+      .foreach(path => Try {
+        SQLite.setLibraryPath(path)
+        SQLite.loadLibrary()
+      })
   }
 
   def stop() = server.stop()
@@ -60,19 +70,19 @@ class DynamoDbServer(port: Int = 8989) {
 
   private var exceptionType: Option[InjectedFailure] = None
 
-  def setExceptionType(exception: AmazonServiceExceptionType) = this.exceptionType = Some(InjectedFailure(
+  def forcedToFailsWith(exception: AmazonServiceExceptionType) = this.exceptionType = Some(InjectedFailure(
     responseCode = exception.getResponseStatus,
     errorCode = exception.getErrorCode,
     errorMessage = exception.getMessage
   ))
 
-  def setException(responseCode: Int, errorCode: String = "", errorMessage: String = "") = this.exceptionType = Some(InjectedFailure(
+  def forcedToFailsWith(responseCode: Int, errorCode: String = "", errorMessage: String = "") = this.exceptionType = Some(InjectedFailure(
     responseCode = responseCode,
     errorCode = errorCode,
     errorMessage = errorMessage
   ))
 
-  def clearExceptionType() = this.exceptionType = None
+  def clearForcedFailure() = this.exceptionType = None
 
   private case class InjectedFailure(responseCode: Int, errorCode: String, errorMessage: String)
 
