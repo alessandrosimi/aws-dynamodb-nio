@@ -86,7 +86,6 @@ class DynamoDbServer(port: Int = 8989) {
 
   private sealed trait HandlerBehaviour
   private object Successful extends HandlerBehaviour
-  private object CancelRequest extends HandlerBehaviour
   private case class InjectedFailure(responseCode: Int, errorCode: String, errorMessage: String) extends HandlerBehaviour
 
   private class LocalDynamoDBServerHandlerWithException(handler: DynamoDBRequestHandler)
