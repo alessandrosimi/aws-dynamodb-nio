@@ -33,6 +33,12 @@ import org.apache.http.{HttpStatus, HttpResponse => ApacheHttpResponse}
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success, Try}
 
+/**
+  * Implementation inspired from [[AmazonHttpClient]] class and
+  * in particular the _executeOneRequest()_ method.
+  * There is no retry logic implemented and no temporary redirection because
+  * is used for a specific S3 scenario.
+  */
 class Invoker(serviceName: String,
               endpoint: URI,
               awsCredentialsProvider: AWSCredentialsProvider,
@@ -86,8 +92,6 @@ class Invoker(serviceName: String,
           apacheHttpResponse = apacheHttpResponse
         )
         new Response[Resp](response, httpResponse)
-      case apacheHttpResponse if isTemporaryRedirect(apacheHttpResponse) =>
-        ??? // TODO implement redirect
       case apacheHttpResponse =>
         val error = handleErrorResponse(
           request = request,
@@ -124,11 +128,6 @@ class Invoker(serviceName: String,
   private def isRequestSuccessful(response: ApacheHttpResponse): Boolean = {
     val status = getStatusCode(response)
     status / 100 == HttpStatus.SC_OK / 100
-  }
-
-  private def isTemporaryRedirect(response: ApacheHttpResponse): Boolean = {
-    val status: Int = response.getStatusLine.getStatusCode
-    status == HttpStatus.SC_TEMPORARY_REDIRECT && response.getHeaders("Location") != null && response.getHeaders("Location").length > 0
   }
 
   private def handleResponse[T](request: Request[_],
