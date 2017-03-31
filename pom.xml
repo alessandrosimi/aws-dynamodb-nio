@@ -9,6 +9,7 @@
     <version>${aws.version}</version>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.11</scala.version>
         <scala.lib.version>2.11.4</scala.lib.version>
         <aws.version>1.10.5.1</aws.version>
