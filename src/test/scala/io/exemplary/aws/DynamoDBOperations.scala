@@ -13,9 +13,10 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.as.aws.dynamodbv2
+package io.exemplary.aws
 
 import com.amazonaws.services.dynamodbv2.model._
+
 import scala.collection.JavaConverters._
 
 trait DynamoDBOperations {

@@ -13,7 +13,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.as.aws.dynamodbv2
+package io.exemplary.aws
 
 import java.net.URI
 
@@ -22,17 +22,17 @@ import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProvider
 import com.amazonaws.http.{Invoker, JsonErrorResponseHandlerV2}
 import com.amazonaws.internal.DefaultServiceEndpointBuilder
 import com.amazonaws.regions.{Region, Regions}
-import com.as.aws.dynamodbv2.AmazonDynamoDBNioClient._
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.model.transform._
 import com.amazonaws.transform.JsonErrorUnmarshallerV2
+import io.exemplary.aws.AmazonDynamoDBNioClient._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmazonDynamoDBNioClient(private[dynamodbv2] val awsCredentialsProvider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain,
-                              private[dynamodbv2] val config: ClientConfiguration = new ClientConfiguration(),
-                              private[dynamodbv2] val endpoint: URI = DefaultEndpoint)(implicit executionContext: ExecutionContext)
+class AmazonDynamoDBNioClient(private[aws] val awsCredentialsProvider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain,
+                              private[aws] val config: ClientConfiguration = new ClientConfiguration(),
+                              private[aws] val endpoint: URI = DefaultEndpoint)(implicit executionContext: ExecutionContext)
   extends AmazonDynamoDBNio[AmazonDynamoDBNioClient] {
 
   def this(region: Regions)(implicit executionContext: ExecutionContext) = this(
@@ -317,7 +317,7 @@ class AmazonDynamoDBNioClient(private[dynamodbv2] val awsCredentialsProvider: AW
 object AmazonDynamoDBNioClient {
 
   private val ServiceName = "dynamodb"
-  private[dynamodbv2] val DefaultEndpoint = URI.create("https://dynamodb.us-east-1.amazonaws.com")
+  private[aws] val DefaultEndpoint = URI.create("https://dynamodb.us-east-1.amazonaws.com")
 
   private def convertEndpointFromRegion(region: Region, clientConfiguration: ClientConfiguration): URI = {
     new DefaultServiceEndpointBuilder(ServiceName, clientConfiguration.getProtocol.toString).withRegion(region).getServiceEndpoint

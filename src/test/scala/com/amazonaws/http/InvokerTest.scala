@@ -24,7 +24,7 @@ import com.amazonaws.services.dynamodbv2.exceptions.AmazonServiceExceptionType
 import com.amazonaws.services.dynamodbv2.model.{ListTablesRequest, ListTablesResult}
 import com.amazonaws.services.dynamodbv2.model.transform.{ListTablesRequestMarshaller, ListTablesResultJsonUnmarshaller}
 import com.amazonaws.transform.JsonUnmarshallerContext
-import com.as.aws.dynamodbv2.AbstractTest
+import io.exemplary.aws.AbstractTest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

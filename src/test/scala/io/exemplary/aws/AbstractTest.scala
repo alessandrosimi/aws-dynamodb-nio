@@ -13,16 +13,16 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.as.aws.dynamodbv2
+package io.exemplary.aws
 
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.internal.StaticCredentialsProvider
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec, Matchers}
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfter with Matchers {
 
