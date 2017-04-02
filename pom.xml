@@ -9,6 +9,26 @@
     <version>${aws.skd.version}</version>
     <name>Aws DynamoDB Nio Client</name>
     <url>http://exemplary.io</url>
+    <description>
+        Scala Dynamo DB client built on top of Apache async http client with almost the same API provided by AWS SKD for Java(tm)
+    </description>
+    <developers>
+        <developer>
+            <id>alessandrosimi</id>
+            <name>Alessandro Simi</name>
+            <url>http://exemplary.io</url>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>scm:git:git@github.com:alessandrosimi/aws-dynamodb-nio.git</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
