@@ -6,7 +6,9 @@
 
     <groupId>io.exemplary.aws</groupId>
     <artifactId>aws-dynamodb-nio_2.11</artifactId>
-    <version>${aws.version}</version>
+    <version>${aws.version}-SNAPSHOT</version>
+    <name>Aws DynamoDB Nio Client</name>
+    <url>http://exemplary.io</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
