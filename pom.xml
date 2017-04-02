@@ -6,7 +6,7 @@
 
     <groupId>io.exemplary.aws</groupId>
     <artifactId>aws-dynamodb-nio_2.11</artifactId>
-    <version>${aws.version}-SNAPSHOT</version>
+    <version>${aws.skd.version}</version>
     <name>Aws DynamoDB Nio Client</name>
     <url>http://exemplary.io</url>
 
@@ -14,7 +14,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.11</scala.version>
         <scala.lib.version>2.11.4</scala.lib.version>
-        <aws.version>1.10.5.1</aws.version>
+        <aws.version>1.10</aws.version>
+        <aws.skd.version>${aws.version}.5.1</aws.skd.version>
+        <aws.server.version>${aws.version}.5.1</aws.server.version>
         <http.async.version>4.1.2</http.async.version>
         <scalatest.version>3.0.1</scalatest.version>
     </properties>
@@ -30,7 +32,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dynamodb</artifactId>
-            <version>${aws.version}</version>
+            <version>${aws.skd.version}</version>
         </dependency>
         <!-- Http Async Client -->
         <dependency>
@@ -50,7 +52,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>DynamoDBLocal</artifactId>
-            <version>${aws.version}</version>
+            <version>${aws.server.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
