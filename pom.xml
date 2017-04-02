@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.exemplary.aws</groupId>
-    <artifactId>aws-dynamodb-nio_2.11</artifactId>
+    <artifactId>aws-dynamodb-nio_${scala.version}</artifactId>
     <version>${aws.skd.version}</version>
     <name>Aws DynamoDB Nio Client</name>
     <url>http://exemplary.io</url>
@@ -178,7 +178,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
