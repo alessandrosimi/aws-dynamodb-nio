@@ -1,4 +1,4 @@
-**Latest release:** Pre Release<br/>
+**Latest release:** 1.10.5.1<br/>
 **License:** [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
 # Aws DynamoDB Non-Blocking IO Client
@@ -22,7 +22,7 @@ futureTableList
   .foreach(println)
 ```
 
-The `NIO` client differs for only two aspects. First it needs an implicit execution context to run it and second, the `setRegion(...)` and `setEndpoint(...)`
+The `NIO` client API differs from the original Amazon Api in two points: it needs an implicit execution context to run it and the `setRegion(...)` and `setEndpoint(...)`
 methods return a new client with the value changed.
 
 ## How to get it
