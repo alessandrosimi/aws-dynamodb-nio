@@ -25,7 +25,8 @@ trait DynamoDBOperations {
   def createTable(name: String,
                   hashKeyName: String = "key",
                   readThroughput: Int = 10,
-                  writeThroughput: Int =  10): CreateTableResult = {
+                  writeThroughput: Int =  10,
+                  streamEnabled: Boolean = false): CreateTableResult = {
     val attributeDefinition = new AttributeDefinition()
       .withAttributeName(hashKeyName)
       .withAttributeType(ScalarAttributeType.S)
@@ -35,6 +36,25 @@ trait DynamoDBOperations {
     val provisionedThroughput = new ProvisionedThroughput()
       .withReadCapacityUnits(readThroughput.toLong)
       .withWriteCapacityUnits(writeThroughput.toLong)
+    createTable(name, attributeDefinition, keySchema, provisionedThroughput, streamEnabled)
+  }
+
+  private def createTable(name: String,
+                          attributeDefinition: AttributeDefinition,
+                          keySchema: KeySchemaElement,
+                          provisionedThroughput: ProvisionedThroughput,
+                          streamEnabled: Boolean): CreateTableResult = if (streamEnabled) {
+    val streamSpecification = new StreamSpecification()
+      .withStreamEnabled(true)
+      .withStreamViewType(StreamViewType.NEW_AND_OLD_IMAGES)
+    val createTableRequest = new CreateTableRequest()
+      .withTableName(name)
+      .withKeySchema(keySchema)
+      .withAttributeDefinitions(attributeDefinition)
+      .withProvisionedThroughput(provisionedThroughput)
+      .withStreamSpecification(streamSpecification)
+    resultOf(client.createTable(createTableRequest))
+  } else {
     resultOf(client.createTable(
       attributeDefinitions = List(attributeDefinition),
       tableName = name,
