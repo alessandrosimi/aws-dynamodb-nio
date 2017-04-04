@@ -27,12 +27,23 @@ methods return a new client with the value changed.
 
 ## How to get it
 
-The client would be soon available directly from maven.
+You can add DynamoNio client as a maven dependency for scala 2.11 ...
 
 ```xml
 <dependency>
-    <groupId>com.as.aws</groupId>
+    <groupId>io.exemplary.aws</groupId>
     <artifactId>aws-dynamodb-nio_2.11</artifactId>
     <version>${aws.version}</version>
 </dependency>
 ```
+... or for scala 2.12 ..
+
+```xml
+<dependency>
+    <groupId>io.exemplary.aws</groupId>
+    <artifactId>aws-dynamodb-nio_2.12</artifactId>
+    <version>${aws.version}</version>
+</dependency>
+```
+
+The current supported AWS vesion is `1.10.5.1`.
