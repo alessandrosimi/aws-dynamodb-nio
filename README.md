@@ -4,7 +4,12 @@
 # Aws DynamoDB Non-Blocking IO Client
 
 Scala dynamoDB client built on top of Apache [async http client](https://hc.apache.org/httpcomponents-asyncclient-dev/)
-with almost the same API provided by [AWS SKD for Java(tm)](https://aws.amazon.com/it/sdk-for-java/)
+with almost the same API provided by [AWS SKD for Java(tm)](https://aws.amazon.com/it/sdk-for-java/).
+
+## Why Non-Blocking IO?
+
+Aws DynamoDB NIO Client compared with other clients uses Non-Blocking IO, so no threads are blocked during the call to Aws services.
+Other async clients use the AWS SKD for Java that is blocking while Aws DynamoDB NIO Client re-implements the SKD with Apache async http client (NIO).
 
 ## Easy to use
 
