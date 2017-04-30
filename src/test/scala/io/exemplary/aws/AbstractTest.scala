@@ -15,6 +15,8 @@
   */
 package io.exemplary.aws
 
+import java.net.URI
+
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.internal.StaticCredentialsProvider
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec, Matchers}
@@ -28,10 +30,10 @@ abstract class AbstractTest extends FeatureSpec with BeforeAndAfterAll with Befo
 
   def resultOf[A](futureResult: Future[A]): A = Await.result(futureResult, 1.minute)
 
-  val server = new DynamoDbServer
+  val server = new DynamoDBServer()
 
   val client = new AmazonDynamoDBNioClient(
-    endpoint = server.endpoint,
+    endpoint = URI.create(server.getEndpoint),
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey"))
   )(global)
 

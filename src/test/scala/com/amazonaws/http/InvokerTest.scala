@@ -16,6 +16,7 @@
 package com.amazonaws.http
 
 import java.io.IOException
+import java.net.URI
 
 import com.amazonaws.{AmazonClientException, AmazonServiceException, ClientConfiguration}
 import com.amazonaws.auth.BasicAWSCredentials
@@ -58,7 +59,7 @@ class InvokerTest extends AbstractTest {
     scenario("Request entity too large") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forceFailureWith(responseCode = 413)
+      server.forceFailureWith(413)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -70,7 +71,7 @@ class InvokerTest extends AbstractTest {
     scenario("Service unavailable") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forceFailureWith(responseCode = 503)
+      server.forceFailureWith(503)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -83,7 +84,7 @@ class InvokerTest extends AbstractTest {
       val handlerException = new Exception("Handler exception")
       val invoker = createInvoker(new FailingHandler(handlerException))
       invoker.start()
-      server.forceFailureWith(responseCode = 999)
+      server.forceFailureWith(999)
       val error = intercept[AmazonClientException] {
         invoke(invoker)
       }
@@ -109,7 +110,7 @@ class InvokerTest extends AbstractTest {
 
   def createInvoker(errorResponseHandler: HttpResponseHandler[AmazonServiceException] = new FailingHandler) = new Invoker(
     serviceName = "dynamodb",
-    endpoint = server.endpoint,
+    endpoint = URI.create(server.getEndpoint),
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey")),
     config = new ClientConfiguration(),
     errorResponseHandler = errorResponseHandler,

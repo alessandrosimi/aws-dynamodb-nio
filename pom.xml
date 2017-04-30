@@ -68,10 +68,10 @@
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- Dynamo DB Local-->
+        <!-- Dynamo DB Server -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>DynamoDBLocal</artifactId>
+            <groupId>io.exemplary.aws</groupId>
+            <artifactId>aws-dynamodb-server</artifactId>
             <version>${aws.server.version}</version>
             <scope>test</scope>
         </dependency>
@@ -201,14 +201,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>dynamodb-local-frankfurt</id>
-            <name>DynamoDB Local Release Repository</name>
-            <url>https://s3.eu-central-1.amazonaws.com/dynamodb-local-frankfurt/release</url>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <repository>

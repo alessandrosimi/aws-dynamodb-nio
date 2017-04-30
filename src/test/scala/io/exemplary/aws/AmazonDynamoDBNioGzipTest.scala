@@ -15,6 +15,8 @@
   */
 package io.exemplary.aws
 
+import java.net.URI
+
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.internal.StaticCredentialsProvider
@@ -48,7 +50,7 @@ class AmazonDynamoDBNioGzipTest extends AbstractTest with DynamoDBOperations {
   }
 
   def createClient = new AmazonDynamoDBNioClient(
-    endpoint = server.endpoint,
+    endpoint = URI.create(server.getEndpoint),
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey")),
     config = clientConfigWithGzip
   )(global)

@@ -15,6 +15,8 @@
   */
 package io.exemplary.aws
 
+import java.net.URI
+
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.http.{Invoker, JsonErrorResponseHandlerV2}
@@ -95,7 +97,7 @@ class AmazonDynamoDBNioStreamTest extends AbstractTest with DynamoDBOperations {
 
   val invoker = new Invoker(
     serviceName = "dynamodb",
-    endpoint = server.endpoint,
+    endpoint = URI.create(server.getEndpoint),
     awsCredentialsProvider = new StaticCredentialsProvider(new BasicAWSCredentials("accessKey", "secretKey")),
     config = new ClientConfiguration(),
     errorResponseHandler = errorResponseHandler,
