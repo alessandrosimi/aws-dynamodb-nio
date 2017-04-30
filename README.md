@@ -52,3 +52,28 @@ You can add DynamoNio client as a maven dependency for scala 2.11 ...
 ```
 
 The current supported AWS vesion is `1.10.5.1`.
+
+## Philosophy behind
+
+Aws DynamoDB NIO Client re-implements the `AWS SKD for Java` keeping the same signature except for the return type of each method that is wrapped in a `Future[T]`.
+
+For example the `putItem(...)` method changes its signature from
+
+```scala
+def putItem(PutItemRequest putItemRequest): PutItemResult;
+```
+
+to
+
+```scala
+def putItem(PutItemRequest putItemRequest): Future[PutItemResult];
+```
+
+## Limitation
+
+Aws DynamoDB NIO Client has few limitations or differences from `AWS SKD for Java`.
+
+1. It does not implement any retry logic
+2. It does not collect any metrics
+3. It does not implement any proxy logic
+
