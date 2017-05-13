@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.exemplary.aws</groupId>
-    <artifactId>aws-dynamodb-nio_${scala.version}</artifactId>
-    <version>${aws.skd.version}</version>
-    <name>Aws DynamoDB Nio Client</name>
+    <artifactId>aws-nio_2.11</artifactId>
+    <version>1.10.5.1</version>
+    <packaging>pom</packaging>
+    <name>Aws Nio</name>
     <url>http://exemplary.io</url>
-    <description>
-        Scala Dynamo DB client built on top of Apache async http client with almost the same API provided by AWS SKD for Java(tm)
-    </description>
+    <description>Parent pom for Scala AWS NIO implementation</description>
     <developers>
         <developer>
             <id>alessandrosimi</id>
@@ -34,54 +33,80 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.11</scala.version>
         <scala.lib.version>2.11.4</scala.lib.version>
-        <aws.version>1.10</aws.version>
-        <aws.skd.version>${aws.version}.5.1</aws.skd.version>
-        <aws.server.version>${aws.version}.5.1</aws.server.version>
+        <aws.version>1.10.5.1</aws.version>
+        <aws.skd.version>${aws.version}</aws.skd.version>
+        <aws.server.version>${aws.version}</aws.server.version>
         <http.async.version>4.1.2</http.async.version>
         <scalatest.version>3.0.1</scalatest.version>
     </properties>
 
-    <dependencies>
-        <!-- Scala -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.lib.version}</version>
-        </dependency>
-        <!-- DynamoDB -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-dynamodb</artifactId>
-            <version>${aws.skd.version}</version>
-        </dependency>
-        <!-- Http Async Client -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>${http.async.version}</version>
-        </dependency>
-        <!-- Test -->
-        <!-- Scala Test -->
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Dynamo DB Server -->
-        <dependency>
-            <groupId>io.exemplary.aws</groupId>
-            <artifactId>aws-dynamodb-server</artifactId>
-            <version>${aws.server.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>core</module>
+        <module>dynamodb</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Scala -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.lib.version}</version>
+            </dependency>
+            <!-- Core -->
+            <dependency>
+                <groupId>io.exemplary.aws</groupId>
+                <artifactId>aws-core-nio_${scala.version}</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Aws Core -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-core</artifactId>
+                <version>${aws.skd.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- Aws DynamoDB -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-dynamodb</artifactId>
+                <version>${aws.skd.version}</version>
+            </dependency>
+            <!-- Http Async Client -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>${http.async.version}</version>
+            </dependency>
+            <!-- Test -->
+            <!-- Scala Test -->
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.version}</artifactId>
+                <version>${scalatest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Dynamo DB Server -->
+            <dependency>
+                <groupId>io.exemplary.aws</groupId>
+                <artifactId>aws-dynamodb-server</artifactId>
+                <version>${aws.server.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <!-- Profiles -->
     <profiles>
         <profile>
             <id>scala12</id>
             <properties>
+                <project.artifactId>aws-nio_2.12</project.artifactId>
                 <scala.version>2.12</scala.version>
                 <scala.lib.version>2.12.1</scala.lib.version>
             </properties>
@@ -134,73 +159,6 @@
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <plugins>
-            <!-- Scala -->
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>doc-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sourceDir>src/main/scala</sourceDir>
-                    <testSourceDir>src/test/scala</testSourceDir>
-                    <scalaVersion>${scala.lib.version}</scalaVersion>
-                </configuration>
-            </plugin>
-            <!-- Surefire -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-            <!-- Scala Test -->
-            <plugin>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest-maven-plugin</artifactId>
-                <version>1.0</version>
-                <configuration>
-                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                    <junitxml>.</junitxml>
-                    <filereports>WDF TestSuite.txt</filereports>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <distributionManagement>
         <repository>

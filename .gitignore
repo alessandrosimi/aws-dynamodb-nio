@@ -1,4 +1,4 @@
-target/
-*.iml
+core/target/
+dynamodb/target/
 .idea/
-!sqlite4java-*.dll
+*.iml
