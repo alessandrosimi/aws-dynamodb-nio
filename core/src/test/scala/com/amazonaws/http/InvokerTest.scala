@@ -47,7 +47,7 @@ class InvokerTest extends AbstractTest {
       val ioException = new IOException("Failing for IO Exception")
       val invoker = createInvoker(new FailingHandler(ioException))
       invoker.start()
-      server.forceFailureWith(AmazonServiceExceptionType.INTERNAL_FAILURE)
+      server.failsWith(AmazonServiceExceptionType.INTERNAL_FAILURE)
       val error = intercept[IOException] {
         invoke(invoker)
       }
@@ -58,7 +58,7 @@ class InvokerTest extends AbstractTest {
     scenario("Request entity too large") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forceFailureWith(413)
+      server.failsWithResponseCode(413)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -70,7 +70,7 @@ class InvokerTest extends AbstractTest {
     scenario("Service unavailable") {
       val invoker = createInvoker(new FailingHandler())
       invoker.start()
-      server.forceFailureWith(503)
+      server.failsWithResponseCode(503)
       val error = intercept[AmazonServiceException] {
         invoke(invoker)
       }
@@ -83,7 +83,7 @@ class InvokerTest extends AbstractTest {
       val handlerException = new Exception("Handler exception")
       val invoker = createInvoker(new FailingHandler(handlerException))
       invoker.start()
-      server.forceFailureWith(999)
+      server.failsWithResponseCode(999)
       val error = intercept[AmazonClientException] {
         invoke(invoker)
       }
@@ -92,7 +92,6 @@ class InvokerTest extends AbstractTest {
     }
 
   }
-
 
   def invoke(invoker: Invoker, failToUnmarshall: Boolean = false) = resultOf {
     invoker.invoke(

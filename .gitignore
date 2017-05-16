@@ -1,4 +1,3 @@
-core/target/
-dynamodb/target/
+target/
 .idea/
 *.iml
